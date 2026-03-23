@@ -24,10 +24,39 @@ class Direction(Enum):
             Direction.W: Direction.E,
         }[self]
 
+
 class Cell:
     def __init__(self):
         self.walls = {d: True for d in Direction}
         self.visited = False
+
+
+class Maze:
+    def __init__(self, grid, start, end):
+        self._grid = grid
+        self.start = start
+        self.end = end
+
+    @property
+    def width(self):
+        return len(self._grid[0])
+
+    @property
+    def height(self):
+        return len(self._grid)
+
+    def cell_at(self, x, y):
+        return self._grid[y][x]
+
+    def neighbours(self, x, y):
+        cell = self.cell_at(x, y)
+
+        for d in Direction:
+            if not cell.walls[d]:
+                nx = x + d.dx
+                ny = y + d.dy
+                if 0 <= nx < self.width and 0 <= ny < self.height:
+                    yield nx, ny
 
 
 def make_grid(width, height):
@@ -65,20 +94,9 @@ def add_start_end(grid):
 
     return (0, 0), (width-1, height-1)
 
+
 def generate_maze(width, height):
     grid = make_grid(width, height)
     dfs(grid, 0, 0)
     start, end = add_start_end(grid)
-    return grid, start, end
-
-def get_neighbours(grid, x, y):
-    height = len(grid)
-    width = len(grid[0])
-    cell = grid[y][x]
-
-    for d in Direction:
-        if not cell.walls[d]:
-            nx = x + d.dx
-            ny = y + d.dy
-            if 0 <= nx < width and 0 <= ny < height:
-                yield nx, ny
+    return Maze(grid, start, end)

@@ -1,9 +1,8 @@
 import heapq
-from maze_generator import get_neighbours  # or redefine DIRS locally
 
-def dijkstra(grid, start, end):
-    width = len(grid[0])
-    height = len(grid)
+def dijkstra(maze):
+    start = maze.start
+    end = maze.end
 
     dist = {start: 0}
     prev = {}
@@ -18,7 +17,7 @@ def dijkstra(grid, start, end):
         if d > dist[(x, y)]:
             continue
 
-        for nx, ny in get_neighbours(grid, x, y):
+        for nx, ny in maze.neighbours(x, y):
             nd = d + 1
             if (nx, ny) not in dist or nd < dist[(nx, ny)]:
                 dist[(nx, ny)] = nd
