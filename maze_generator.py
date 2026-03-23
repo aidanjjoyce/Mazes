@@ -58,10 +58,10 @@ def add_start_end(grid):
     width = len(grid[0])
 
     # Start at top-left: open north wall
-    grid[0][0].walls["N"] = False
+    grid[0][0].walls[Direction.N] = False
 
     # End at bottom-right: open east wall
-    grid[height-1][width-1].walls["E"] = False
+    grid[height-1][width-1].walls[Direction.E] = False
 
     return (0, 0), (width-1, height-1)
 
