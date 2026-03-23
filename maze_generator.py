@@ -1,22 +1,32 @@
 import random
+from enum import Enum
 
-DIRS = {
-    "N": (0, -1),
-    "S": (0, 1),
-    "E": (1, 0),
-    "W": (-1, 0),
-}
+class Direction(Enum):
+    N = (0, -1)
+    S = (0, 1)
+    E = (1, 0)
+    W = (-1, 0)
 
-OPPOSITE = {
-    "N": "S",
-    "S": "N",
-    "E": "W",
-    "W": "E",
-}
+    @property
+    def dx(self):
+        return self.value[0]
+
+    @property
+    def dy(self):
+        return self.value[1]
+
+    @property
+    def opposite(self):
+        return {
+            Direction.N: Direction.S,
+            Direction.S: Direction.N,
+            Direction.E: Direction.W,
+            Direction.W: Direction.E,
+        }[self]
 
 class Cell:
     def __init__(self):
-        self.walls = {"N": True, "S": True, "E": True, "W": True}
+        self.walls = {d: True for d in Direction}
         self.visited = False
 
 
@@ -27,18 +37,18 @@ def make_grid(width, height):
 def dfs(grid, x, y):
     grid[y][x].visited = True
 
-    directions = list(DIRS.keys())
+    directions = list(Direction)
     random.shuffle(directions)
 
     for d in directions:
-        dx, dy = DIRS[d]
-        nx, ny = x + dx, y + dy
+        nx = x + d.dx
+        ny = y + d.dy
 
         if 0 <= nx < len(grid[0]) and 0 <= ny < len(grid):
             if not grid[ny][nx].visited:
                 # Knock down walls
                 grid[y][x].walls[d] = False
-                grid[ny][nx].walls[OPPOSITE[d]] = False
+                grid[ny][nx].walls[d.opposite] = False
 
                 dfs(grid, nx, ny)
 
@@ -67,7 +77,7 @@ def render(grid, start=None, end=None, path=None):
     row = "+"
     for x in range(width):
         cell = grid[0][x]
-        row += "---+" if cell.walls["N"] else "   +"
+        row += "---+" if cell.walls[Direction.N] else "   +"
     print(row)
 
     for y in range(height):
@@ -78,7 +88,7 @@ def render(grid, start=None, end=None, path=None):
 
             # West wall for the first cell in the row
             if x == 0:
-                row += "|" if cell.walls["W"] else " "
+                row += "|" if cell.walls[Direction.W] else " "
 
             # Choose interior content
             if start == (x, y):
@@ -93,14 +103,14 @@ def render(grid, start=None, end=None, path=None):
             row += interior
 
             # East wall
-            row += "|" if cell.walls["E"] else " "
+            row += "|" if cell.walls[Direction.E] else " "
         print(row)
 
         # Row with horizontal walls (south walls)
         row = "+"
         for x in range(width):
             cell = grid[y][x]
-            row += "---+" if cell.walls["S"] else "   +"
+            row += "---+" if cell.walls[Direction.S] else "   +"
         print(row)
 
 
@@ -115,10 +125,9 @@ def get_neighbours(grid, x, y):
     width = len(grid[0])
     cell = grid[y][x]
 
-    for d, (dx, dy) in DIRS.items():
-        if not cell.walls[d]:  # passage exists
-            nx, ny = x + dx, y + dy
-
-            # Bounds check — essential!
+    for d in Direction:
+        if not cell.walls[d]:
+            nx = x + d.dx
+            ny = y + d.dy
             if 0 <= nx < width and 0 <= ny < height:
-                yield (nx, ny)
+                yield nx, ny

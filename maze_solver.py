@@ -1,5 +1,5 @@
 import heapq
-from maze_generator import DIRS, get_neighbours  # or redefine DIRS locally
+from maze_generator import get_neighbours  # or redefine DIRS locally
 
 def dijkstra(grid, start, end):
     width = len(grid[0])
