@@ -65,55 +65,6 @@ def add_start_end(grid):
 
     return (0, 0), (width-1, height-1)
 
-
-def render(grid, start=None, end=None, path=None):
-    width = len(grid[0])
-    height = len(grid)
-
-    # Convert path to a set for O(1) lookup
-    path_set = set(path) if path else set()
-
-    # Render the north walls of the first row
-    row = "+"
-    for x in range(width):
-        cell = grid[0][x]
-        row += "---+" if cell.walls[Direction.N] else "   +"
-    print(row)
-
-    for y in range(height):
-        # Row with vertical walls
-        row = ""
-        for x in range(width):
-            cell = grid[y][x]
-
-            # West wall for the first cell in the row
-            if x == 0:
-                row += "|" if cell.walls[Direction.W] else " "
-
-            # Choose interior content
-            if start == (x, y):
-                interior = " S "
-            elif end == (x, y):
-                interior = " E "
-            elif (x, y) in path_set:
-                interior = " * "
-            else:
-                interior = "   "
-
-            row += interior
-
-            # East wall
-            row += "|" if cell.walls[Direction.E] else " "
-        print(row)
-
-        # Row with horizontal walls (south walls)
-        row = "+"
-        for x in range(width):
-            cell = grid[y][x]
-            row += "---+" if cell.walls[Direction.S] else "   +"
-        print(row)
-
-
 def generate_maze(width, height):
     grid = make_grid(width, height)
     dfs(grid, 0, 0)
