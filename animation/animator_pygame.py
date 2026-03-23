@@ -1,6 +1,6 @@
 import pygame
 import time
-from maze_renderer_pygame import draw_maze, draw_cursor, CELL_SIZE
+from rendering.renderer_pygame import draw_maze, draw_cursor, CELL_SIZE
 
 
 def _init_window(maze):

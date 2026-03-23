@@ -1,6 +1,6 @@
-from maze_generator import generate_maze
-from maze_solver import dijkstra
-from maze_animator_pygame import animate_path
+from generation.maze_generator import generate_maze
+from solving.solver_dijkstra import dijkstra
+from animation.animator_pygame import animate_path
 
 def main():
     maze = generate_maze(15, 15)

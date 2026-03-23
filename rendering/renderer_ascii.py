@@ -1,4 +1,4 @@
-from maze_generator import Direction
+from generation.maze_generator import Direction
 
 def _render_top_border(maze):
     row = "+"

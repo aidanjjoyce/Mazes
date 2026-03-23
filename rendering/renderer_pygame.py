@@ -1,5 +1,5 @@
 import pygame
-from maze_generator import Direction
+from generation.maze_generator import Direction
 
 CELL_SIZE = 20
 WALL_COLOR = (0, 0, 0)
