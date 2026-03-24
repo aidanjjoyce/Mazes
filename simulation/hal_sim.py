@@ -2,8 +2,8 @@
 Simulator implementation of the HAL.
 
 This is the only file that knows about both the firmware (robot/) and
-the ground truth maze (generation/). It is the platform layer — the
-equivalent of the hardware drivers on a real micromouse.
+the ground truth maze (generation/). It is the platform layer modelling
+the hardware drivers on a real micromouse.
 
 The firmware never imports this. It is wired up at startup via hal.register().
 """
@@ -41,9 +41,6 @@ def _sense_right() -> bool:
 def _move_forward() -> None:
     """
     Advance both firmware believed position and ground truth position.
-    These are updated together here because in this simulation movement
-    is perfect — no slip, no error. If you later want to model drift,
-    this is the place to introduce a discrepancy.
     """
     firmware.x += firmware.DX[firmware.heading]
     firmware.y += firmware.DY[firmware.heading]

@@ -1,11 +1,11 @@
 """
 Simulator ground truth state.
 
-This is physical reality — where the robot actually is in the maze.
-The firmware cannot import this. Only hal_sim.py reads from it.
+This models the physical reality of where the robot actually is in the maze,
+independent of the robot's internal model.
+Only hal_sim.py reads from it.
 
 In a perfect simulation this stays in sync with robot.state.
-Later, introducing motor slip or sensor noise would cause drift.
 """
 import robot.state as firmware
 
