@@ -31,6 +31,11 @@ heading = NORTH
 # Unknown and absent are not distinguished yet.
 walls = bytearray(WIDTH * HEIGHT)
 
+# One byte per cell. Lower 4 bits = which walls have been sensed.
+# A 1 bit here means we have a definitive reading for that wall.
+# Combined with walls: known+present = solid wall, known+absent = open, unknown = faint.
+walls_known = bytearray(WIDTH * HEIGHT)
+
 
 def reset():
     global x, y, heading
@@ -39,18 +44,34 @@ def reset():
     heading = NORTH
     for i in range(len(walls)):
         walls[i] = 0
+        walls_known[i] = 0
 
 
 def cell_index(cx, cy):
     return cy * WIDTH + cx
 
 
-def mark_wall(cx, cy, absolute_direction):
-    walls[cell_index(cx, cy)] |= WALL_BITS[absolute_direction]
+def mark_wall(cx, cy, absolute_direction, present):
+    """
+    Record a wall sensing result.
+    present=True means a wall is there; False means it is absent.
+    Both cases mark the wall as known.
+    """
+    idx = cell_index(cx, cy)
+    bit = WALL_BITS[absolute_direction]
+    if present:
+        walls[idx] |= bit
+    else:
+        walls[idx] &= ~bit
+    walls_known[idx] |= bit
 
 
 def has_wall(cx, cy, absolute_direction):
     return bool(walls[cell_index(cx, cy)] & WALL_BITS[absolute_direction])
+
+
+def is_known(cx, cy, absolute_direction):
+    return bool(walls_known[cell_index(cx, cy)] & WALL_BITS[absolute_direction])
 
 
 def relative_to_absolute(relative_offset):
