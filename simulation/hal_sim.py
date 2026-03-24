@@ -1,0 +1,64 @@
+"""
+Simulator implementation of the HAL.
+
+This is the only file that knows about both the firmware (robot/) and
+the ground truth maze (generation/). It is the platform layer — the
+equivalent of the hardware drivers on a real micromouse.
+
+The firmware never imports this. It is wired up at startup via hal.register().
+"""
+import robot.hal as hal
+import robot.state as firmware
+import simulation.sim_state as sim
+
+
+def _wall_in_absolute_direction(absolute_direction):
+    """
+    Query the ground truth maze for a wall adjacent to the robot's
+    actual position in a given absolute direction.
+    """
+    from generation.maze_generator import Direction
+    direction_map = {
+        firmware.NORTH: Direction.N,
+        firmware.EAST:  Direction.E,
+        firmware.SOUTH: Direction.S,
+        firmware.WEST:  Direction.W,
+    }
+    cell = sim.maze.cell_at(sim.x, sim.y)
+    return cell.walls[direction_map[absolute_direction]]
+
+
+def _sense_left() -> bool:
+    return _wall_in_absolute_direction(firmware.relative_to_absolute(-1))
+
+def _sense_front() -> bool:
+    return _wall_in_absolute_direction(firmware.relative_to_absolute(0))
+
+def _sense_right() -> bool:
+    return _wall_in_absolute_direction(firmware.relative_to_absolute(1))
+
+
+def _move_forward() -> None:
+    """
+    Advance both firmware believed position and ground truth position.
+    These are updated together here because in this simulation movement
+    is perfect — no slip, no error. If you later want to model drift,
+    this is the place to introduce a discrepancy.
+    """
+    firmware.x += firmware.DX[firmware.heading]
+    firmware.y += firmware.DY[firmware.heading]
+    sim.advance()
+
+
+def init(maze):
+    """
+    Initialise the simulator and register this platform with the HAL.
+    Call this once before running any firmware code.
+    """
+    sim.init(maze)
+    hal.register(
+        sense_left=_sense_left,
+        sense_front=_sense_front,
+        sense_right=_sense_right,
+        move_forward=_move_forward,
+    )
