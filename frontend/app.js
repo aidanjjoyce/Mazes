@@ -79,12 +79,45 @@ function drawRobot(ctx, rx, ry, heading) {
     ctx.restore();
 }
 
-function drawGroundTruth(canvas, maze, step) {
-    drawMaze(canvas, maze);
-    drawRobot(canvas.getContext("2d"), step.x, step.y, step.heading);
+function drawTrail(ctx, steps, currentStep) {
+    ctx.fillStyle = "rgba(127, 255, 110, 0.5)";
+    const seen = new Set();
+    for (let i = 0; i <= currentStep; i++) {
+        const { x, y } = steps[i];
+        const key = `${x},${y}`;
+        if (!seen.has(key)) {
+            seen.add(key);
+            ctx.fillRect(x * CELL + 1, y * CELL + 1, CELL - 2, CELL - 2);
+        }
+        if (i > 0) {
+            const px = steps[i - 1].x, py = steps[i - 1].y;
+            if (x !== px || y !== py) {
+                const pkey = `${Math.min(x,px)},${Math.min(y,py)},${x !== px ? 'h' : 'v'}`;
+                if (!seen.has(pkey)) {
+                    seen.add(pkey);
+                    if (x !== px) {
+                        const lx = Math.min(x, px);
+                        ctx.fillRect(lx * CELL + CELL - 1, y * CELL + 1, 2, CELL - 2);
+                    } else {
+                        const ty = Math.min(y, py);
+                        ctx.fillRect(x * CELL + 1, ty * CELL + CELL - 1, CELL - 2, 2);
+                    }
+                }
+            }
+        }
+    }
 }
 
-function drawKnownMap(canvas, maze, step) {
+function drawGroundTruth(canvas, maze, steps, currentStep) {
+    const step = steps[currentStep];
+    drawMaze(canvas, maze);
+    const ctx = canvas.getContext("2d");
+    drawTrail(ctx, steps, currentStep);
+    drawRobot(ctx, step.x, step.y, step.heading);
+}
+
+function drawKnownMap(canvas, maze, steps, currentStep) {
+    const step = steps[currentStep];
     const ctx = canvas.getContext("2d");
     const W = maze.width  * CELL;
     const H = maze.height * CELL;
@@ -128,6 +161,7 @@ function drawKnownMap(canvas, maze, step) {
     ctx.fillStyle = "#ff6e6e";
     ctx.fill();
 
+    drawTrail(ctx, steps, currentStep);
     drawRobot(ctx, step.x, step.y, step.heading);
 }
 
@@ -171,8 +205,8 @@ function App() {
     useEffect(() => {
         if (!steps || !maze) return;
         const step = steps[currentStep];
-        if (mazeCanvasRef.current)  drawGroundTruth(mazeCanvasRef.current,  maze, step);
-        if (knownCanvasRef.current) drawKnownMap(knownCanvasRef.current, maze, step);
+        if (mazeCanvasRef.current)  drawGroundTruth(mazeCanvasRef.current,  maze, steps, currentStep);
+        if (knownCanvasRef.current) drawKnownMap(knownCanvasRef.current, maze, steps, currentStep);
     }, [currentStep, steps, maze]);
 
     // ── Playback timer ───────────────────────────────────────────────────────
