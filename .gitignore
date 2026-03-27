@@ -8,4 +8,4 @@ __pycache__/maze_solver.cpython-39.pyc
 .idea/vcs.xml
 *.pyc
 .vscode/settings.json
-.claude/worktrees/gallant-greider/
+.claude/worktrees/
