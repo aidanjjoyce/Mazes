@@ -91,7 +91,7 @@ def draw_known_map(screen, robot_state, maze, offset_x=0):
                 elif not known:
                     color = UNKNOWN_COLOR
                 else:
-                    continue  # known absent — draw nothing
+                    color = CELL_COLOR  # erase any previous unknown wall
 
                 pygame.draw.line(
                     screen, color,

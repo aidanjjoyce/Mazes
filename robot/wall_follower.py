@@ -28,6 +28,21 @@ def _sense_and_record(relative_offset) -> bool:
     return wall
 
 
+def _move_forward_and_record():
+    # Determine absolute direction before moving
+    direction = state.relative_to_absolute(0)
+
+    # Mark the wall in the current cell as absent
+    state.mark_wall(state.x, state.y, direction, present=False)
+
+    # Move the robot
+    hal.move_robot_forward()
+
+    # After moving, mark the opposite wall in the new cell as absent
+    opposite = (direction + 2) % 4
+    state.mark_wall(state.x, state.y, opposite, present=False)
+
+
 def run():
     """
     Run the wall follower until the robot reaches the goal cell.
@@ -40,12 +55,12 @@ def run():
 
         if not wall_left:
             hal.turn_left()
-            hal.move_robot_forward()
+            _move_forward_and_record()
         elif not wall_front:
-            hal.move_robot_forward()
+            _move_forward_and_record()
         elif not wall_right:
             hal.turn_right()
-            hal.move_robot_forward()
+            _move_forward_and_record()
         else:
             hal.turn_left()
             hal.turn_left()
