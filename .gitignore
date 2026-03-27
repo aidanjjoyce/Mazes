@@ -3,9 +3,8 @@
 .idea/Mazes.iml
 .idea/misc.xml
 .idea/modules.xml
-__pycache__/maze_generator.cpython-39.pyc
-__pycache__/maze_solver.cpython-39.pyc
 .idea/vcs.xml
+__pycache__/
 *.pyc
 .vscode/settings.json
 .claude/worktrees/gallant-greider/
