@@ -94,3 +94,29 @@ def generate_maze(width, height):
     dfs(grid, 0, 0)
     start, end = add_start_end(grid)
     return Maze(grid, start, end)
+
+
+def maze_to_dict(maze):
+    """Serialise a Maze to a plain dict suitable for JSON responses."""
+    cells = []
+    for y in range(maze.height):
+        row = []
+        for x in range(maze.width):
+            cell = maze.cell_at(x, y)
+            row.append({
+                "walls": {
+                    "N": cell.walls[Direction.N],
+                    "S": cell.walls[Direction.S],
+                    "E": cell.walls[Direction.E],
+                    "W": cell.walls[Direction.W],
+                }
+            })
+        cells.append(row)
+ 
+    return {
+        "width": maze.width,
+        "height": maze.height,
+        "start": {"x": maze.start[0], "y": maze.start[1]},
+        "end":   {"x": maze.end[0],   "y": maze.end[1]},
+        "cells": cells,
+    }
