@@ -52,10 +52,11 @@ def _move_forward() -> None:
         _on_render()
 
 
-def init(maze, on_render=None):
+def init(maze, on_render=None, on_turn=None):
     """
     Initialise the simulator and register this platform with the HAL.
     on_render: optional callable fired after every move_forward.
+    on_turn:   optional callable fired after every turn_left / turn_right.
     Call this once before running any firmware code.
     """
     global _on_render
@@ -66,4 +67,6 @@ def init(maze, on_render=None):
         sense_front=_sense_front,
         sense_right=_sense_right,
         move_forward=_move_forward,
+        on_turn_left=on_turn,
+        on_turn_right=on_turn,
     )
