@@ -3,6 +3,7 @@ const { useState, useRef, useEffect, useCallback } = React;
 function App() {
     const [width,       setWidth]       = useState(15);
     const [height,      setHeight]      = useState(15);
+    const [solver,      setSolver]      = useState("wall_follower");
     const [maze,        setMaze]        = useState(null);
     const [steps,       setSteps]       = useState(null);
     const [currentStep, setCurrentStep] = useState(0);
@@ -70,7 +71,7 @@ function App() {
             const res = await fetch("/simulate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ width, height }),
+                body: JSON.stringify({ width, height, solver }),
             });
             if (!res.ok) throw new Error(`Server error ${res.status}`);
             const data = await res.json();
@@ -78,7 +79,7 @@ function App() {
             setSteps(data.steps);
         } catch (err) { setError(err.message); }
         finally { setLoading(false); }
-    }, [width, height]);
+    }, [width, height, solver]);
 
     const cellCount = width * height;
     const stepLabel = steps ? `${currentStep + 1} / ${steps.length}` : null;
@@ -154,6 +155,22 @@ function App() {
         </aside>
 
         <div className="canvas-area">
+            {maze && (
+            <div className="solver-bar">
+                <span className="solver-bar-label">solver</span>
+                <select
+                    className="solver-select"
+                    value={solver}
+                    onChange={e => { setSolver(e.target.value); setSteps(null); }}
+                    disabled={loading}
+                >
+                    <option value="wall_follower">wall follower</option>
+                    <option value="flood_fill">flood fill</option>
+                </select>
+            </div>
+            )}
+
+            <div className="canvas-main">
             {!maze && !loading && (
             <div className="empty-state">
                 <div className="icon">⌗</div>
@@ -203,6 +220,7 @@ function App() {
             </div>
             )}
             {error && <div className="error-bar">error: {error}</div>}
+            </div>
         </div>
         </main>
     </>

@@ -5,6 +5,7 @@
 #include "state.hpp"
 #include "hal.hpp"
 #include "wall_follower.hpp"
+#include "flood_fill.hpp"
 
 namespace py = pybind11;
 using namespace robot;
@@ -20,7 +21,7 @@ using namespace robot;
 // ---------------------------------------------------------------------------
 
 PYBIND11_MODULE(robot_cpp, m) {
-    m.doc() = "C++ robot firmware — wall-follower micromouse";
+    m.doc() = "C++ robot firmware — micromouse solvers (wall-follower, flood-fill)";
 
     // -----------------------------------------------------------------------
     // Module-level constants
@@ -123,5 +124,19 @@ PYBIND11_MODULE(robot_cpp, m) {
              py::keep_alive<1, 3>())   // WallFollower keeps hal alive
         .def("run", &WallFollower::run)
         .def_property_readonly("state", &WallFollower::state,
+             py::return_value_policy::reference_internal);
+
+    // -----------------------------------------------------------------------
+    // FloodFill
+    //
+    // Identical lifetime rules to WallFollower — py::keep_alive ensures the
+    // RobotState and Hal objects outlive the FloodFill instance.
+    // -----------------------------------------------------------------------
+    py::class_<FloodFill>(m, "FloodFill")
+        .def(py::init<RobotState&, Hal&>(),
+             py::keep_alive<1, 2>(),   // FloodFill keeps state alive
+             py::keep_alive<1, 3>())   // FloodFill keeps hal alive
+        .def("run", &FloodFill::run)
+        .def_property_readonly("state", &FloodFill::state,
              py::return_value_policy::reference_internal);
 }

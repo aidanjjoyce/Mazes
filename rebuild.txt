@@ -1,0 +1,2 @@
+cd robot_cpp\build
+cmake --build . --config Release

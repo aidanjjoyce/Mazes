@@ -31,6 +31,7 @@ find_package(pybind11 CONFIG REQUIRED)
 pybind11_add_module(robot_cpp
     src/state.cpp
     src/wall_follower.cpp
+    src/flood_fill.cpp
     bindings.cpp
 )
 

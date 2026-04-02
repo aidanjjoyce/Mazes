@@ -67,13 +67,14 @@ def _move_forward() -> None:
 # init — called once by app.py before every simulation run
 # ---------------------------------------------------------------------------
 
-def init(maze, on_render=None, on_turn=None) -> robot_cpp.WallFollower:
+def init(maze, on_render=None, on_turn=None, solver: str = "wall_follower"):
     """
     Create fresh C++ firmware objects, wire up the HAL, and return the
-    WallFollower ready to run.
+    requested solver ready to run.
 
     on_render: called after every move_forward (position snapshot)
     on_turn:   called after every turn_left / turn_right (heading snapshot)
+    solver:    "wall_follower" (default) or "flood_fill"
     """
     global firmware, _hal, _on_render
     _on_render = on_render
@@ -92,6 +93,8 @@ def init(maze, on_render=None, on_turn=None) -> robot_cpp.WallFollower:
     _hal.on_turn_left  = on_turn or (lambda: None)
     _hal.on_turn_right = on_turn or (lambda: None)
 
-    # Construct and return the C++ WallFollower.
+    # Construct and return the requested solver.
     # pybind11 keep_alive ensures firmware and _hal stay alive for its lifetime.
+    if solver == "flood_fill":
+        return robot_cpp.FloodFill(firmware, _hal)
     return robot_cpp.WallFollower(firmware, _hal)
