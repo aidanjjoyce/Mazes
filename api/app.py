@@ -36,38 +36,36 @@ def generate(req: MazeRequest):
 @app.post("/simulate")
 def simulate(req: MazeRequest):
     """
-    Generate a maze, run the wall-follower simulation, and return every
+    Generate a maze, run the C++ wall-follower firmware, and return every
     state snapshot captured after each turn or move.
     """
-    import robot.state as robot_state
+    import robot_cpp
     from simulation.hal_sim import init as sim_init
-    from robot import wall_follower
+    import simulation.hal_sim as hal_sim
 
     maze = generate_maze(req.width, req.height)
-
-    # Resize firmware state arrays to match this maze before reset
-    robot_state.WIDTH  = maze.width
-    robot_state.HEIGHT = maze.height
-    robot_state.walls       = bytearray(maze.width * maze.height)
-    robot_state.walls_known = bytearray(maze.width * maze.height)
 
     steps = []
 
     def record():
+        # Read the firmware state directly from the C++ RobotState object.
+        # hal_sim.firmware is the RobotState created in sim_init().
+        f = hal_sim.firmware
         steps.append({
-            "x":           robot_state.x,
-            "y":           robot_state.y,
-            "heading":     robot_state.heading,
-            "walls":       list(robot_state.walls),
-            "walls_known": list(robot_state.walls_known),
+            "x":           f.x,
+            "y":           f.y,
+            "heading":     f.heading,        # int 0–3 via C++ property
+            "walls":       list(f.walls),    # list of ints via pybind11/stl
+            "walls_known": list(f.walls_known),
         })
 
-    # sim_init calls sim_state.init → firmware.reset, then registers HAL
-    sim_init(maze, on_render=record, on_turn=record)
+    # sim_init wires up the HAL and returns the C++ WallFollower.
+    robot = sim_init(maze, on_render=record, on_turn=record)
 
-    # Capture starting position before any movement
+    # Capture the starting position before any movement.
     record()
 
-    wall_follower.run()
+    # Run the C++ firmware — this call blocks until the goal is reached.
+    robot.run()
 
     return {"maze": maze_to_dict(maze), "steps": steps}

@@ -1,10 +1,62 @@
+# =============================================================================
+# Python
+# =============================================================================
+__pycache__/
+*.pyc
+*.pyo
+
+# =============================================================================
+# C++ build output
+# =============================================================================
+# CMake build directories
+# robot_cpp/build/ — created when running cmake manually from the command line
+# robot_cpp/out/   — created by Visual Studio when it opens CMakeLists.txt directly
+robot_cpp/build/
+robot_cpp/out/
+
+# CMake generated files that can appear in-source if cmake is run from the
+# project root rather than a build/ subdirectory
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+
+# Compiled Python extension module (built from robot_cpp/)
+*.pyd
+*.pdb     # debug symbols generated alongside .pyd on Windows
+*.so      # Linux/macOS equivalent of .pyd
+
+# =============================================================================
+# Visual Studio
+# =============================================================================
+# The entire .vs/ folder is local IDE state — never needs to be committed
+.vs/
+
+# VS index files
+*.vsidx
+*.db
+*.opensdf
+*.sdf
+
+# =============================================================================
+# JetBrains IDEs (IntelliJ / PyCharm / CLion)
+# =============================================================================
+# Committing some .idea files is intentional (shared run configs, code style)
+# but these are local-only and should not be shared
 .idea/inspectionProfiles/profiles_settings.xml
 .idea/inspectionProfiles/Project_Default.xml
 .idea/Mazes.iml
 .idea/misc.xml
 .idea/modules.xml
 .idea/vcs.xml
-__pycache__/
-*.pyc
+
+# =============================================================================
+# VS Code
+# =============================================================================
+# Personal workspace settings are local-only
 .vscode/settings.json
+
+# =============================================================================
+# Claude Code
+# =============================================================================
 .claude/worktrees/
